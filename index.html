@@ -104,6 +104,20 @@ td.biz-c{color:var(--biz)} td.youth-c{color:var(--youth)}
 tbody tr:hover{background:var(--panel2)}
 .tag{display:inline-block;font-family:var(--mono);font-size:10px;padding:2px 6px;border-radius:4px;border:1px solid var(--line);color:var(--dim);margin-left:6px;vertical-align:middle}
 
+/* pay it forward */
+.pif{display:grid;grid-template-columns:1.1fr 1fr;gap:20px;align-items:stretch}
+.pif .card p{color:var(--muted);font-size:15px;margin:10px 0}
+.pif .card p b{color:var(--text)}
+.gen{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.gen .g{display:grid;grid-template-columns:120px 1fr auto;align-items:center;gap:12px;font-size:14px}
+.gen .g .who{font-family:var(--mono);font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.1em}
+.gen .g .b{height:22px;background:var(--bg2);border-radius:6px;overflow:hidden}
+.gen .g .b i{display:block;height:100%;border-radius:6px;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.gen .g .n{font-family:var(--mono);font-size:13px;min-width:64px;text-align:right}
+.gen .g.biz .b i{background:var(--biz)} .gen .g.youth .b i{background:var(--youth)}
+.pif .fwd{font-family:var(--mono);font-size:12px;color:var(--cyan);margin-top:14px}
+.pif .fwd b{font-size:26px;display:block;color:var(--text);font-family:var(--font);line-height:1.1}
+@media (max-width:900px){.pif{grid-template-columns:1fr}}
 footer{border-top:1px solid var(--line);color:var(--dim);font-size:12px;font-family:var(--mono)}
 footer .wrap{padding:22px 24px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 
@@ -140,7 +154,7 @@ footer .wrap{padding:22px 24px;display:flex;justify-content:space-between;gap:12
     <div>
       <div class="eyebrow">AI-driven national economic microsimulation</div>
       <h1><span class="acr">AH-YESS!</span><span class="beta">beta 2026</span><br>National Security Simulator</h1>
-      <p class="lede">Put <b>$1 billion</b> into business infrastructure or into youth and girls. Then stress the country with a shock. See what comes back over ten years in returns, security risk and political capital.</p>
+      <p class="lede">Put <b>$1 billion</b> into business infrastructure or into youth and girls. Then stress the country with a shock. See what comes back over ten years in returns, security risk and political capital. Then see what gets <b>paid forward</b>: a business return pays out once, a girl who finishes school pays it into the next generation.</p>
       <div class="meta"><span>Oxford</span><span>Johannesburg</span><span>Washington DC</span><span>Germany</span></div>
     </div>
     <img src="assets/city.jpg" alt="Isometric illustration of a connected city">
@@ -193,6 +207,10 @@ footer .wrap{padding:22px 24px;display:flex;justify-content:space-between;gap:12
     </div>
 
     <div style="height:36px"></div>
+    <div class="sec-title"><h2>Paying it forward</h2><p>what happens to a return after it is earned</p></div>
+    <div class="pif" id="pif"></div>
+
+    <div style="height:36px"></div>
     <div class="sec-title"><h2>Side-by-side</h2><p>same $ · same shock · different pathway</p></div>
     <div class="card" style="padding:0;overflow:auto"><table id="cmp"></table></div>
 
@@ -230,7 +248,8 @@ const MODEL = {
   youth: {
     label:"Strategy B · Youth & girls investment", cls:"youth",
     steady:  {roi:6.0, sec:1.0, pol:0,
-      path:["Development and health impacts","Government revenue &amp; ministry-specific savings","Macroeconomic growth &amp; private-sector returns","Savings from direct female health service costs averted"],
+      path:["<b>Paid forward:</b> girls who finish school keep their own children in school",
+             "Development and health impacts","Government revenue &amp; ministry-specific savings","Macroeconomic growth &amp; private-sector returns","Savings from direct female health service costs averted"],
       cite:"Steady-state ROI channels (values TBD in beta)",
       note:"$6bn return over 10 years; channel-level $ values still to be quantified."},
     conflict:{roi:6.0, sec:0.6, pol:14,
@@ -247,6 +266,9 @@ const CURVES={
   conflict:{title:"National agricultural productivity · food security",high:[20,25,38,55,74,95,118],base:null,low:[20,20,22,24,25,26,27]},
 };
 
+// share of each generation's return that is reinvested in the next cohort (illustrative)
+const PIF={biz:0.05, youth:0.55};
+const GENS=["Today","Their children","Grandchildren"];
 const POLL=[["All voters",81],["Trump voters",77],["Republicans",79],["Independents",79],["Democrats",85]];
 
 // ---------- state ----------
@@ -321,12 +343,29 @@ function poll(){
    <div class="cite">55% of US voters are less likely to vote for candidates that do not support aid for children.</div>`;
 }
 
+function pif(){
+  const base=amt;
+  const chain=k=>{const r=MODEL[k][scen]||MODEL[k].steady;let v=base*r.roi,out=[v];for(let g=1;g<3;g++){v=v*PIF[k]*r.roi;out.push(v);}return out;};
+  const cb=chain("biz"), cy=chain("youth");
+  const max=Math.max(...cb,...cy);
+  const rows=(arr,cls)=>arr.map((v,i)=>`<div class="g ${cls}"><span class="who">${GENS[i]}</span><div class="b"><i style="width:${Math.max(2,v/max*100)}%"></i></div><span class="n">${fmt(v)}</span></div>`).join("");
+  const tb=cb.reduce((a,b)=>a+b,0), ty=cy.reduce((a,b)=>a+b,0);
+  const keys=strat==="both"?["biz","youth"]:[strat];
+  const L={biz:"Strategy A pays out once",youth:"Strategy B pays it forward"};
+  const T={biz:`About <b>${Math.round(PIF.biz*100)}%</b> of a business return finds its way into the next generation: dividends, some tax, a little philanthropy. The rest leaves the loop.`,
+           youth:`A girl who finishes school earns more, marries later, has healthier children and keeps <b>them</b> in school. Roughly <b>${Math.round(PIF.youth*100)}%</b> of what she gains is reinvested in the next cohort, and it compounds at the same ${(MODEL.youth[scen]||MODEL.youth.steady).roi}:1 rate.`};
+  $("#pif").innerHTML=keys.map(k=>`<div class="card ${k}"><h3>${L[k]}</h3><div class="sub">${fmt(base)} today · ${SCEN[scen].name.toLowerCase()} · three generations</div>
+     <p>${T[k]}</p><div class="gen">${rows(k==="biz"?cb:cy,k)}</div>
+     <div class="fwd"><b>${fmt(k==="biz"?tb:ty)}</b>cumulative across three generations</div></div>`).join("");
+}
+
 function table(){
   const rows=[
     ["Return over 10 years", s=>`${MODEL.biz[s].roi}:1`, s=>`${MODEL.youth[s].roi}:1`],
     ["Total return on "+fmt(amt), s=>fmt(MODEL.biz[s].roi*amt), s=>fmt(MODEL.youth[s].roi*amt)],
     ["Crime / civil unrest", s=>`${MODEL.biz[s].sec}× baseline`, s=>`${MODEL.youth[s].sec}× baseline`],
     ["Voter support", s=>`${MODEL.biz[s].pol}%`, s=>`+${MODEL.youth[s].pol}%`],
+    ["Paid forward to next generation", s=>`${Math.round(PIF.biz*100)}% of return`, s=>`${Math.round(PIF.youth*100)}% of return`],
   ];
   const scens=["steady","conflict"];
   $("#cmp").innerHTML=`<thead><tr><th>Metric</th>${scens.map(s=>`<th colspan=2>${SCEN[s].name}</th>`).join("")}</tr>
@@ -342,7 +381,7 @@ function render(){
   const keys=strat==="both"?["biz","youth"]:[strat];
   const cards=$("#cards"); cards.className="grid "+(keys.length===2?"g2":"");
   cards.innerHTML=keys.map(card).join("");
-  chart(); table();
+  chart(); table(); pif();
   $("#mini").innerHTML=`<b>${strat==="both"?"A vs B":strat==="biz"?"A · Business":"B · Youth"}</b><span>${SCEN[scen].name}</span><b>${fmt(amt)}</b><a href="#" onclick="window.scrollTo({top:document.getElementById('controls').offsetTop,behavior:'smooth'});return false">change</a>`;
 }
 
