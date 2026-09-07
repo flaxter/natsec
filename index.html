@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AH-YESS! — National Security Simulator</title>
+<meta name="description" content="AI High-Security Youth National Economic Scenario Simulation. Compare $1bn investment strategies across national security scenarios.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#070d24; --bg2:#0c153a; --panel:#111b45; --panel2:#16225a;
+  --line:#26337a; --text:#e8ecfb; --muted:#9aa5d3; --dim:#6c78ad;
+  --cyan:#3fd4ff; --cyan2:#1aa7d8; --amber:#ffb545; --red:#ff5d6c; --green:#4ade80;
+  --biz:#ffb545; --youth:#3fd4ff;
+  --font:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.5}
+a{color:var(--cyan)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+
+/* HERO */
+.hero{position:relative;overflow:hidden;background:radial-gradient(1200px 600px at 80% 20%,#152a7a 0%,transparent 60%),linear-gradient(180deg,#0a1440 0%,var(--bg) 100%);border-bottom:1px solid var(--line)}
+.hero .wrap{display:grid;grid-template-columns:1.2fr 1fr;gap:32px;align-items:center;padding-top:56px;padding-bottom:48px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan);margin-bottom:14px}
+h1{font-size:clamp(30px,4.2vw,52px);line-height:1.05;margin:0 0 14px;font-weight:700;letter-spacing:-.01em}
+h1 .acr{color:var(--cyan)}
+.lede{font-size:18px;color:var(--muted);max-width:56ch;margin:0 0 22px}
+.meta{font-family:var(--mono);font-size:12px;color:var(--dim);display:flex;gap:18px;flex-wrap:wrap}
+.meta span::before{content:"◆ ";color:var(--cyan2)}
+.hero img{width:100%;border-radius:14px;box-shadow:0 30px 80px rgba(0,0,0,.5);mask-image:linear-gradient(180deg,#000 80%,transparent)}
+.beta{display:inline-block;font-family:var(--mono);font-size:11px;border:1px solid var(--amber);color:var(--amber);padding:2px 8px;border-radius:999px;margin-left:10px;vertical-align:middle}
+
+/* CONTROLS */
+.controls{background:var(--bg2);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5;backdrop-filter:blur(8px)}
+.controls .wrap{display:grid;grid-template-columns:auto 1fr auto;gap:28px;align-items:center;padding-top:14px;padding-bottom:14px}
+.lbl{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+.seg{display:inline-flex;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:3px;gap:3px}
+.seg button{background:transparent;border:0;color:var(--muted);font:inherit;font-weight:600;font-size:14px;padding:8px 14px;border-radius:7px;cursor:pointer;transition:.15s}
+.seg button:hover{color:var(--text)}
+.seg button.on[data-s="biz"]{background:var(--biz);color:#1a1200}
+.seg button.on[data-s="youth"]{background:var(--youth);color:#00131c}
+.seg button.on[data-s="both"]{background:var(--text);color:#0a1440}
+.scen{display:flex;gap:8px;flex-wrap:wrap}
+.scen button{background:var(--panel);border:1px solid var(--line);color:var(--muted);font:inherit;font-size:13px;font-weight:500;padding:8px 12px;border-radius:999px;cursor:pointer;display:flex;align-items:center;gap:7px;transition:.15s}
+.scen button:hover{border-color:var(--cyan2);color:var(--text)}
+.scen button.on{background:var(--panel2);border-color:var(--cyan);color:var(--text);box-shadow:0 0 0 3px rgba(63,212,255,.15)}
+.scen button .ic{font-size:15px}
+.amt{display:flex;flex-direction:column;align-items:flex-end}
+.amt output{font-family:var(--mono);font-size:22px;font-weight:500;color:var(--text)}
+.amt input[type=range]{width:160px;accent-color:var(--cyan)}
+
+/* RESULTS */
+main .wrap{padding-top:36px;padding-bottom:64px}
+.sec-title{display:flex;align-items:baseline;justify-content:space-between;gap:16px;margin:0 0 18px}
+.sec-title h2{font-size:22px;margin:0;font-weight:600}
+.sec-title p{margin:0;color:var(--dim);font-size:13px;font-family:var(--mono)}
+.grid{display:grid;gap:16px}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px;position:relative;overflow:hidden}
+.card.biz{border-top:3px solid var(--biz)}
+.card.youth{border-top:3px solid var(--youth)}
+.card h3{margin:0 0 4px;font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.card .sub{font-size:12px;color:var(--dim);font-family:var(--mono)}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+.tile{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:14px}
+.tile .k{font-family:var(--mono);font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.1em}
+.tile .v{font-size:30px;font-weight:700;line-height:1.1;margin:6px 0 2px;font-variant-numeric:tabular-nums}
+.tile .d{font-size:12px;color:var(--muted)}
+.up{color:var(--green)} .down{color:var(--red)} .warn{color:var(--amber)}
+.bar{height:8px;background:var(--bg);border-radius:99px;overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;border-radius:99px;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.pathway{margin-top:16px;font-size:14px;color:var(--muted)}
+.pathway b{color:var(--text);font-weight:600}
+.pathway .arrow{color:var(--cyan2);margin:0 6px}
+.cite{font-family:var(--mono);font-size:11px;color:var(--dim);margin-top:10px}
+.placeholder{position:absolute;inset:0;background:rgba(7,13,36,.72);display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;backdrop-filter:blur(2px);border-radius:14px}
+.placeholder div{max-width:36ch;color:var(--muted);font-size:14px}
+.placeholder b{display:block;color:var(--amber);font-family:var(--mono);font-size:12px;letter-spacing:.14em;margin-bottom:8px}
+
+/* chart */
+.chart{margin-top:8px}
+.chart svg{width:100%;height:auto;display:block}
+.legend{display:flex;gap:18px;font-size:13px;color:var(--muted);margin-top:8px;flex-wrap:wrap}
+.legend i{display:inline-block;width:18px;height:3px;vertical-align:middle;margin-right:6px;border-radius:2px}
+
+/* poll */
+.poll .row{display:grid;grid-template-columns:120px 1fr 48px;align-items:center;gap:12px;margin:8px 0;font-size:14px}
+.poll .row .b{height:14px;background:var(--bg2);border-radius:99px;overflow:hidden;position:relative}
+.poll .row .b i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan2),var(--cyan));border-radius:99px}
+.poll .row .b::after{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;border-left:1px dashed var(--dim)}
+.poll .row .n{font-family:var(--mono);text-align:right}
+.big{font-size:56px;font-weight:700;line-height:1;color:var(--cyan)}
+.big small{display:block;font-size:12px;font-family:var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-top:6px}
+
+/* compare table */
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:12px 14px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);font-weight:500}
+td.biz-c{color:var(--biz)} td.youth-c{color:var(--youth)}
+tbody tr:hover{background:var(--panel2)}
+.tag{display:inline-block;font-family:var(--mono);font-size:10px;padding:2px 6px;border-radius:4px;border:1px solid var(--line);color:var(--dim);margin-left:6px;vertical-align:middle}
+
+footer{border-top:1px solid var(--line);color:var(--dim);font-size:12px;font-family:var(--mono)}
+footer .wrap{padding:22px 24px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+@media (max-width:900px){
+  .hero .wrap{grid-template-columns:1fr}
+  .controls .wrap{grid-template-columns:1fr}
+  .g3,.g2,.tiles{grid-template-columns:1fr}
+  .amt{align-items:flex-start}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">AI-driven national economic microsimulation</div>
+      <h1><span class="acr">AH-YESS!</span><span class="beta">beta 2026</span><br>National Security Simulator</h1>
+      <p class="lede">Put <b>$1 billion</b> into business infrastructure or into youth and girls. Then stress the country with a shock. See what comes back over ten years in returns, security risk and political capital.</p>
+      <div class="meta"><span>Oxford</span><span>Johannesburg</span><span>Washington DC</span></div>
+    </div>
+    <img src="assets/city.jpg" alt="Isometric illustration of a connected city">
+  </div>
+</header>
+
+<section class="controls">
+  <div class="wrap">
+    <div>
+      <div class="lbl">Strategy</div>
+      <div class="seg" id="strat">
+        <button data-s="biz">A · Business</button>
+        <button data-s="youth">B · Youth &amp; girls</button>
+        <button data-s="both" class="on">Compare</button>
+      </div>
+    </div>
+    <div>
+      <div class="lbl">Scenario over 10 years</div>
+      <div class="scen" id="scen">
+        <button data-k="steady" class="on"><span class="ic">▬</span>Steady state</button>
+        <button data-k="conflict"><span class="ic">⚔</span>Conflict with state / terrorist org</button>
+        <button data-k="civil"><span class="ic">⚠</span>Bad actors incite civil violence</button>
+        <button data-k="weather"><span class="ic">🌪</span>Extreme weather event</button>
+        <button data-k="epidemic"><span class="ic">☣</span>Epidemic outbreak</button>
+      </div>
+    </div>
+    <div class="amt">
+      <div class="lbl">Investment</div>
+      <output id="amtOut">$1.0bn</output>
+      <input type="range" id="amt" min="0.5" max="5" step="0.5" value="1">
+    </div>
+  </div>
+</section>
+
+<main>
+  <div class="wrap">
+
+    <div class="sec-title"><h2 id="resTitle">Results</h2><p id="resSub"></p></div>
+    <div class="grid g2" id="cards"></div>
+
+    <div style="height:36px"></div>
+    <div class="sec-title"><h2 id="chartTitle">Sector growth</h2><p>USD billions · illustrative trajectories</p></div>
+    <div class="card chart" id="chartCard"></div>
+
+    <div style="height:36px"></div>
+    <div class="grid g2">
+      <div class="card poll" id="pollCard"></div>
+      <div class="card" id="evidCard"></div>
+    </div>
+
+    <div style="height:36px"></div>
+    <div class="sec-title"><h2>Side-by-side</h2><p>same $ · same shock · different pathway</p></div>
+    <div class="card" style="padding:0;overflow:auto"><table id="cmp"></table></div>
+
+  </div>
+</main>
+
+<footer><div class="wrap">
+  <span>AH-YESS! · AI High-Security Youth National Economic Scenario Simulation · beta 2026</span>
+  <span>Mockup. Figures are illustrative and drawn from the concept deck; not model output.</span>
+</div></footer>
+
+<script>
+// ---------- data lifted from the concept deck ----------
+const SCEN = {
+  steady:   {name:"Steady state", sub:"no shock · 10-year horizon", ready:true},
+  conflict: {name:"Internal / external conflict", sub:"conflict with another state or terrorist organisation", ready:true},
+  civil:    {name:"Civil violence", sub:"bad actor(s) incite civil violence", ready:false},
+  weather:  {name:"Extreme weather event", sub:"flood / drought / heat shock", ready:false},
+  epidemic: {name:"Epidemic outbreak", sub:"health-system shock", ready:false},
+};
+
+// per $1bn. roi = total return multiple over 10y; sec = crime/civil-unrest multiplier; pol = voter support delta (pp)
+const MODEL = {
+  biz: {
+    label:"Strategy A · Business investment", cls:"biz",
+    steady:  {roi:6.0, sec:1.0, pol:0,
+      path:["Public AI equities <b>$5.5 : $1</b>","Offshore oil rigs <b>$6 : $1</b>"],
+      cite:"MSCI ACWI IMI Robotics & AI Index; NRP Project Finance Market Report",
+      note:"Average total returns over 10 years across the two asset classes."},
+    conflict:{roi:3.0, sec:3.0, pol:-4,
+      path:["School dropout<span class=arrow>→</span>unemployment<span class=arrow>→</span><b>1.8× crime rate</b>","Family violence + unemployment<span class=arrow>→</span><b>1.25× voluntary recruitment</b> into terrorist groups","<b>6% GDP penalty</b> for movement from low to high / organised crime","<b>$21.7m</b> median cost per terrorist attack"],
+      cite:"UNDP 2023; McLaughlin & Associates 2026",
+      note:"Lack of trust in government: 55% of US voters less likely to vote for candidates who do not support aid for children."},
+  },
+  youth: {
+    label:"Strategy B · Youth & girls investment", cls:"youth",
+    steady:  {roi:6.0, sec:1.0, pol:0,
+      path:["Development and health impacts","Government revenue &amp; ministry-specific savings","Macroeconomic growth &amp; private-sector returns","Savings from direct female health service costs averted"],
+      cite:"Steady-state ROI channels (values TBD in beta)",
+      note:"$6bn return over 10 years; channel-level $ values still to be quantified."},
+    conflict:{roi:6.0, sec:0.6, pol:14,
+      path:["Girls stay in school<span class=arrow>→</span>employment<span class=arrow>→</span><b>0.6× crime / civil unrest</b>","National agricultural productivity<span class=arrow>→</span><b>national food security</b>","Trust in government<span class=arrow>→</span><b>+14% voter support</b>"],
+      cite:"McLaughlin & Associates, April 2026, n=1,200, ±2.8%",
+      note:"81% of likely voters support helping vulnerable children in Africa and preventing trafficking of teenage girls."},
+  }
+};
+
+// chart curves (illustrative, shape taken from the deck's hand-drawn charts), USD bn, 2023–2050
+const YEARS=[2023,2025,2030,2035,2040,2045,2050];
+const CURVES={
+  steady:{title:"AI sector market size",high:[20,26,42,62,85,110,135],base:[20,24,34,46,60,74,88],low:[20,22,28,35,42,48,54]},
+  conflict:{title:"National agricultural productivity · food security",high:[20,25,38,55,74,95,118],base:null,low:[20,20,22,24,25,26,27]},
+};
+
+const POLL=[["All voters",81],["Trump voters",77],["Republicans",79],["Independents",79],["Democrats",85]];
+
+// ---------- state ----------
+let strat="both", scen="steady", amt=1;
+
+const $=s=>document.querySelector(s);
+const fmt=n=>"$"+n.toFixed(1)+"bn";
+
+function tile(k,v,d,cls){return `<div class="tile"><div class="k">${k}</div><div class="v ${cls||""}">${v}</div><div class="d">${d}</div></div>`}
+
+function card(key){
+  const m=MODEL[key], r=m[scen]||m.steady, ready=SCEN[scen].ready;
+  const ret=r.roi*amt;
+  const secCls=r.sec>1?"down":r.sec<1?"up":"";
+  const polCls=r.pol>0?"up":r.pol<0?"down":"";
+  const barW=Math.min(100,r.sec/3*100);
+  return `<div class="card ${m.cls}">
+    <h3>${m.label}</h3>
+    <div class="sub">${fmt(amt)} invested · ${SCEN[scen].name.toLowerCase()}</div>
+    <div class="tiles">
+      ${tile("10-yr return",`${r.roi.toFixed(1)}<span style="font-size:16px;color:var(--muted)">:1</span>`,`≈ ${fmt(ret)} total return`,"")}
+      ${tile("Security risk",`${r.sec.toFixed(1)}×`,`crime / civil unrest vs baseline<div class="bar"><i style="width:${barW}%;background:${r.sec>1?'var(--red)':r.sec<1?'var(--green)':'var(--dim)'}"></i></div>`,secCls)}
+      ${tile("Political risk",`${r.pol>0?"+":""}${r.pol}%`,`voter support for government`,polCls)}
+    </div>
+    <div class="pathway">${r.path.map(p=>`<div>› ${p}</div>`).join("")}</div>
+    <div class="cite">${r.note}<br>Source: ${r.cite}</div>
+    ${ready?"":`<div class="placeholder"><div><b>SCENARIO NOT YET CALIBRATED</b>The ${SCEN[scen].name.toLowerCase()} pathway is in the beta roadmap. Showing steady-state values as a stand-in.</div></div>`}
+  </div>`;
+}
+
+function chart(){
+  const c=CURVES[scen]||CURVES.steady;
+  const W=900,H=320,L=56,R=20,T=18,B=40, ymax=140;
+  const x=i=>L+(YEARS[i]-2023)/(2050-2023)*(W-L-R);
+  const y=v=>T+(1-v/ymax)*(H-T-B);
+  const line=(arr,col,dash)=>`<path d="${arr.map((v,i)=>(i?"L":"M")+x(i)+","+y(v)).join(" ")}" fill="none" stroke="${col}" stroke-width="3" ${dash?'stroke-dasharray="6 6"':''} stroke-linejoin="round"/>`;
+  const area=`<path d="${c.high.map((v,i)=>(i?"L":"M")+x(i)+","+y(v)).join(" ")} ${c.low.map((v,i)=>"L"+x(i)+","+y(v)).reverse().join(" ")} Z" fill="url(#g)"/>`;
+  let grid="";
+  for(let v=0;v<=ymax;v+=20) grid+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="#26337a" stroke-width="1"/><text x="${L-8}" y="${y(v)+4}" text-anchor="end" font-size="11" fill="#6c78ad" font-family="IBM Plex Mono,monospace">${v}</text>`;
+  YEARS.forEach((yr,i)=>grid+=`<text x="${x(i)}" y="${H-12}" text-anchor="middle" font-size="11" fill="#6c78ad" font-family="IBM Plex Mono,monospace">${yr}</text>`);
+  const showB=strat!=="youth", showY=strat!=="biz";
+  const legend=`<div class="legend">
+     ${showY?`<span><i style="background:var(--youth)"></i>High investment in girls</span>`:""}
+     ${c.base?`<span><i style="background:#9aa5d3"></i>Baseline</span>`:""}
+     ${showB?`<span><i style="background:var(--biz)"></i>Low investment in girls (business only)</span>`:""}
+     <span style="color:var(--dim)">Estimated ${c.title.toLowerCase()}, USD bn</span></div>`;
+  $("#chartTitle").textContent=c.title;
+  $("#chartCard").innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${c.title}">
+    <defs><linearGradient id="g" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#3fd4ff" stop-opacity=".18"/><stop offset="1" stop-color="#3fd4ff" stop-opacity="0"/></linearGradient></defs>
+    ${grid}${strat==="both"?area:""}
+    ${c.base?line(c.base,"#9aa5d3",true):""}
+    ${showB?line(c.low,"#ffb545"):""}
+    ${showY?line(c.high,"#3fd4ff"):""}
+    ${showY?`<circle cx="${x(6)}" cy="${y(c.high[6])}" r="5" fill="#3fd4ff"/>`:""}
+    ${showB?`<circle cx="${x(6)}" cy="${y(c.low[6])}" r="5" fill="#ffb545"/>`:""}
+  </svg>${legend}`;
+}
+
+function poll(){
+  $("#pollCard").innerHTML=`<h3>Trust in government</h3><div class="sub">likely US voters · McLaughlin & Associates, 6–11 April 2026, n=1,200, ±2.8%</div>
+   <div style="display:flex;gap:24px;align-items:flex-end;margin:16px 0 8px"><div class="big">81%<small>of likely voters</small></div>
+   <p style="margin:0;color:var(--muted);font-size:14px">support the U.S. helping “children in Africa who are orphaned and made vulnerable by AIDS” and preventing “sexual trafficking and abuse of teenage girls.”</p></div>
+   ${POLL.map(([k,v])=>`<div class="row"><span>${k}</span><div class="b"><i style="width:${v}%"></i></div><span class="n">${v}</span></div>`).join("")}
+   <div class="cite">dashed line = 50% majority</div>`;
+  $("#evidCard").innerHTML=`<h3>Cost of the business-only pathway under conflict</h3><div class="sub">what the simulator prices in</div>
+   <div class="tiles" style="grid-template-columns:1fr 1fr">
+     ${tile("Per attack","$21.7m","median cost of a terrorist attack","warn")}
+     ${tile("GDP penalty","6%","moving from low to high / organised crime","down")}
+     ${tile("Crime rate","1.8×","school dropout → unemployment","down")}
+     ${tile("Recruitment","1.25×","family violence + unemployment → terrorist groups (UNDP 2023)","down")}
+   </div>
+   <div class="cite">55% of US voters are less likely to vote for candidates that do not support aid for children.</div>`;
+}
+
+function table(){
+  const rows=[
+    ["Return over 10 years", s=>`${MODEL.biz[s].roi}:1`, s=>`${MODEL.youth[s].roi}:1`],
+    ["Total return on "+fmt(amt), s=>fmt(MODEL.biz[s].roi*amt), s=>fmt(MODEL.youth[s].roi*amt)],
+    ["Crime / civil unrest", s=>`${MODEL.biz[s].sec}× baseline`, s=>`${MODEL.youth[s].sec}× baseline`],
+    ["Voter support", s=>`${MODEL.biz[s].pol}%`, s=>`+${MODEL.youth[s].pol}%`],
+  ];
+  const scens=["steady","conflict"];
+  $("#cmp").innerHTML=`<thead><tr><th>Metric</th>${scens.map(s=>`<th colspan=2>${SCEN[s].name}</th>`).join("")}</tr>
+   <tr><th></th>${scens.map(()=>`<th style="color:var(--biz)">A · Business</th><th style="color:var(--youth)">B · Youth</th>`).join("")}</tr></thead>
+   <tbody>${rows.map(([n,a,b])=>`<tr><td>${n}</td>${scens.map(s=>`<td class="biz-c">${a(s)}</td><td class="youth-c">${b(s)}</td>`).join("")}</tr>`).join("")}
+   <tr><td>Civil violence · extreme weather · epidemic</td><td colspan=4 style="color:var(--dim)">Scenarios in beta roadmap <span class="tag">TBD</span></td></tr></tbody>`;
+}
+
+function render(){
+  $("#amtOut").value=fmt(amt);
+  $("#resTitle").textContent=`${SCEN[scen].name} · ${fmt(amt)} over 10 years`;
+  $("#resSub").textContent=SCEN[scen].sub;
+  const keys=strat==="both"?["biz","youth"]:[strat];
+  const cards=$("#cards"); cards.className="grid "+(keys.length===2?"g2":"");
+  cards.innerHTML=keys.map(card).join("");
+  chart(); table();
+}
+
+$("#strat").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;strat=b.dataset.s;[...$("#strat").children].forEach(x=>x.classList.toggle("on",x===b));render();});
+$("#scen").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;scen=b.dataset.k;[...$("#scen").children].forEach(x=>x.classList.toggle("on",x===b));render();});
+$("#amt").addEventListener("input",e=>{amt=parseFloat(e.target.value);render();});
+poll(); render();
+</script>
+</body>
+</html>
