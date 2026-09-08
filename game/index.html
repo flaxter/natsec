@@ -84,14 +84,45 @@ button.go:disabled{opacity:.5;cursor:default}
 .lesson{background:#f1faf3;border:2px solid #cfe6d3;border-radius:14px;padding:12px 14px;margin-top:12px;font-weight:600}
 a{color:var(--sage2)}
 .foot{margin-top:24px;font-size:12px;color:var(--soft);text-align:center}
-@media (max-width:640px){.meters{grid-template-columns:repeat(2,1fr)}.facts{grid-template-columns:1fr}.split{grid-template-columns:1fr}.grid{gap:4px}}
+.mute{background:var(--paper);border:2px solid var(--line);border-radius:999px;width:40px;height:40px;font-size:18px;cursor:pointer;box-shadow:0 3px 0 var(--line)}
+.topr{display:flex;gap:8px;align-items:center}
+@media (max-width:640px){
+  .wrap{padding:10px 10px 120px}
+  h1{font-size:22px} h1 small{font-size:12px}
+  .top{margin-bottom:8px;align-items:center}
+  .year{padding:5px 10px;font-size:14px;border-radius:12px} .year span{font-size:11px}
+  .town{padding:8px;min-height:0;border-radius:16px}
+  .sunny{font-size:28px;top:8px;right:12px} .cloud{font-size:20px;top:10px}
+  .grid{grid-template-columns:repeat(8,1fr);gap:4px;margin-top:40px}
+  .tile{font-size:clamp(18px,7vw,30px);border-radius:7px}
+  .toast{top:6px;padding:6px 10px;font-size:13px;border-radius:10px}
+  .meters{grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0}
+  .m{padding:6px 8px;border-radius:12px;min-width:0} .m .k{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .m .v{font-size:15px} .m .b{height:5px;margin-top:4px}
+  .panel{padding:12px;border-radius:16px}
+  .panel h2{font-size:16px} .panel p{font-size:13px;margin-bottom:8px}
+  .preset{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -12px 8px;padding:0 12px}
+  .preset::-webkit-scrollbar{display:none}
+  .preset button{white-space:nowrap;flex:0 0 auto;font-size:12px;padding:4px 10px}
+  .split{grid-template-columns:1fr 1fr;grid-template-areas:"b y" "s s";gap:8px}
+  .split .b{grid-area:b} .split .y{grid-area:y} .split input{grid-area:s}
+  .side{padding:8px} .side .ic{font-size:26px} .side .n{font-size:18px} .side .t{font-size:11px}
+  .btns{position:fixed;left:0;right:0;bottom:0;z-index:9;background:rgba(255,253,247,.94);backdrop-filter:blur(8px);border-top:2px solid var(--line);padding:10px 12px calc(10px + env(safe-area-inset-bottom));margin:0;justify-content:space-between;flex-wrap:nowrap}
+  .btns .go{flex:1;font-size:15px;padding:12px 14px}
+  .xs{display:none}
+  .btns .ghost{padding:10px 12px;font-size:13px}
+  .report .btns{position:static;background:none;border:0;padding:0;margin-top:14px}
+  .log{font-size:13px} .log div{padding:3px 0}
+  .facts{grid-template-columns:1fr} .fact .big{font-size:22px}
+  .report h2{font-size:20px} .stars{font-size:22px}
+  .foot{font-size:11px;margin-top:12px}
+}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="top">
     <h1>Ten Good Years <small>a cosy little game about spending a billion dollars</small></h1>
-    <div class="year" id="year">Year 1 <span>of 10 · $100m to spend</span></div>
+    <div class="topr"><div class="year" id="year">Year 1 <span>of 10 · $100m to spend</span></div><button class="mute" id="mute" title="Sound on/off" aria-label="Toggle sound">🔊</button></div>
   </div>
 
   <div class="town" id="town">
@@ -102,9 +133,9 @@ a{color:var(--sage2)}
   </div>
 
   <div class="meters">
-    <div class="m"><div class="k">💰 Treasury returns</div><div class="v" id="mT">$0m</div><div class="b"><i id="bT" style="background:var(--sun)"></i></div></div>
-    <div class="m"><div class="k">🕊️ Peace &amp; safety</div><div class="v" id="mS">calm</div><div class="b"><i id="bS" style="background:var(--sage)"></i></div></div>
-    <div class="m"><div class="k">🗳️ Trust in government</div><div class="v" id="mP">50%</div><div class="b"><i id="bP" style="background:var(--sky2)"></i></div></div>
+    <div class="m"><div class="k">💰 Returns</div><div class="v" id="mT">$0m</div><div class="b"><i id="bT" style="background:var(--sun)"></i></div></div>
+    <div class="m"><div class="k">🕊️ Peace</div><div class="v" id="mS">calm</div><div class="b"><i id="bS" style="background:var(--sage)"></i></div></div>
+    <div class="m"><div class="k">🗳️ Trust</div><div class="v" id="mP">50%</div><div class="b"><i id="bP" style="background:var(--sky2)"></i></div></div>
     <div class="m"><div class="k">🌱 Paid forward</div><div class="v" id="mF">$0m</div><div class="b"><i id="bF" style="background:var(--youth)"></i></div></div>
   </div>
 
@@ -117,7 +148,7 @@ a{color:var(--sage2)}
       <input type="range" id="split" min="0" max="100" step="5" value="50">
       <div class="side y"><div class="ic">🏫</div><div class="n" id="nY">$50m</div><div class="t">schools &amp; clinics for girls</div></div>
     </div>
-    <div class="btns"><button class="go" id="go">Spend it and see what happens ▶</button><button class="ghost" id="reset">Start over</button></div>
+    <div class="btns"><button class="go" id="go">Spend it<span class="xs"> and see what happens</span> ▶</button><button class="ghost" id="reset">Start over</button></div>
     <div class="log" id="log"></div>
   </div>
 
@@ -127,6 +158,24 @@ a{color:var(--sage2)}
 </div>
 
 <script>
+// ---- sound: tiny synth, no assets ----
+const SND={on:true,ctx:null};
+try{SND.on=localStorage.getItem("tgy-mute")!=="1";}catch(e){}
+function actx(){if(!SND.ctx){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;SND.ctx=new C();}if(SND.ctx.state==="suspended")SND.ctx.resume();return SND.ctx;}
+function tone(f,t0,dur,type="sine",vol=.18,slide=0){const c=actx();if(!c||!SND.on)return;const o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f,c.currentTime+t0);if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(30,f+slide),c.currentTime+t0+dur);g.gain.setValueAtTime(0,c.currentTime+t0);g.gain.linearRampToValueAtTime(vol,c.currentTime+t0+.01);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t0+dur);o.connect(g).connect(c.destination);o.start(c.currentTime+t0);o.stop(c.currentTime+t0+dur+.05);}
+function noise(t0,dur,vol=.25){const c=actx();if(!c||!SND.on)return;const n=c.sampleRate*dur,b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*(1-i/n);const src=c.createBufferSource();src.buffer=b;const g=c.createGain();g.gain.value=vol;const f=c.createBiquadFilter();f.type="lowpass";f.frequency.value=900;src.connect(f).connect(g).connect(c.destination);src.start(c.currentTime+t0);}
+const SFX={
+  click:()=>tone(660,0,.06,"square",.06),
+  coin:()=>{tone(1320,0,.08,"square",.08);tone(1760,.07,.14,"square",.08);},
+  build:()=>{tone(392,0,.08,"triangle",.15);tone(523,.08,.1,"triangle",.15);tone(659,.16,.16,"triangle",.15);},
+  calm:()=>{[523,659,784].forEach((f,i)=>tone(f,i*.09,.25,"sine",.12));},
+  bad:()=>{noise(0,.35,.3);tone(180,0,.4,"sawtooth",.12,-120);},
+  boom:()=>{noise(0,.5,.4);tone(90,0,.5,"sine",.25,-60);},
+  win:()=>{[523,659,784,1047].forEach((f,i)=>tone(f,i*.12,.3,"triangle",.14));tone(1319,.5,.6,"triangle",.14);},
+  meh:()=>{[440,415,392].forEach((f,i)=>tone(f,i*.2,.35,"triangle",.12));},
+};
+function setMute(on){SND.on=on;document.getElementById("mute").textContent=on?"🔊":"🔇";try{localStorage.setItem("tgy-mute",on?"0":"1");}catch(e){}}
+
 // ---- the same points as the simulator, wrapped in a game ----
 const YEARS=10, BUDGET=100; // $m per year, $1bn total
 const EVENTS=[
@@ -180,10 +229,13 @@ function step(){
     line+= youthShare>0.5 ? `The town holds together: neighbours know each other, girls stay in school, trust rises.` : `Dropouts drift into gangs and crime climbs; voters blame the government.`;
   } else line+=`A quiet year. Returns of ${fmt(gain)} come in.`;
   S.log.unshift(line);
+  SFX.click(); setTimeout(()=>{ if(S.newTile!=null)SFX.build(); },120);
+  setTimeout(()=>{ if(ev.bad){ S.hurtTile!=null?SFX.boom():SFX.bad(); } else { SFX.calm(); SFX.coin(); } },380);
   S.toast=ev.bad?{t:`${ev.ic} ${ev.name}`,c:"bad"}:{t:`🌤️ A quiet year · +${fmt(gain)}`,c:"good"};
   S.year++;
   if(S.year>YEARS){S.done=true;}
   render();
+  if(window.innerWidth<=640&&!S.done) window.scrollTo({top:0,behavior:"smooth"});
   if(S.done) report();
 }
 
@@ -221,12 +273,15 @@ function report(){
     <div class="lesson">🌱 ${lesson}</div>
     <div class="btns" style="margin-top:14px"><button class="go" onclick="reset()">Play again</button><a class="ghost" style="display:inline-block;text-decoration:none" href="../">See the full simulator →</a></div>
   </div>`;
+  setTimeout(()=>stars>=3?SFX.win():SFX.meh(),700);
   $("report").scrollIntoView({behavior:"smooth"});
 }
 
-$("split").addEventListener("input",e=>{const y=+e.target.value;$("nY").textContent=fmt(y);$("nB").textContent=fmt(100-y);});
-document.querySelectorAll(".preset button").forEach(b=>b.onclick=()=>{$("split").value=b.dataset.v;$("split").dispatchEvent(new Event("input"));});
-$("go").onclick=step; $("reset").onclick=reset;
+$("split").addEventListener("input",e=>{const y=+e.target.value;if(e.isTrusted)tone(500+y*4,0,.04,"square",.04);$("nY").textContent=fmt(y);$("nB").textContent=fmt(100-y);});
+document.querySelectorAll(".preset button").forEach(b=>b.onclick=()=>{SFX.click();$("split").value=b.dataset.v;$("split").dispatchEvent(new Event("input"));});
+$("go").onclick=step; $("reset").onclick=()=>{SFX.click();reset();};
+$("mute").onclick=()=>{actx();setMute(!SND.on);if(SND.on)SFX.coin();};
+setMute(SND.on);
 reset();
 </script>
 </body>
