@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ten Good Years</title>
+<meta name="description" content="A cosy little game about spending a billion dollars wisely. Companion to the AI-DEFENSE national security simulator.">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sky:#fdf6e3; --cream:#fff9ec; --paper:#fffdf7; --ink:#3b3228; --soft:#8a7b6b; --line:#eadfc8;
+  --sage:#7fae8c; --sage2:#5d9a6e; --peach:#f5b07a; --peach2:#e8955a; --rose:#e88a8a; --sun:#f7d774; --sky2:#9fd0e6;
+  --biz:#f0a35e; --youth:#79b3c9;
+  --font:"Nunito",system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--font);line-height:1.45}
+body{background:linear-gradient(180deg,#e9f3f7 0%,var(--sky) 45%,#f3e9d2 100%);min-height:100vh}
+.wrap{max-width:960px;margin:0 auto;padding:18px 16px 60px}
+h1{font-size:34px;margin:0;font-weight:800;letter-spacing:-.01em}
+h1 small{display:block;font-size:14px;font-weight:600;color:var(--soft)}
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.year{background:var(--paper);border:2px solid var(--line);border-radius:16px;padding:8px 16px;font-weight:800;font-size:18px;box-shadow:0 4px 0 var(--line)}
+.year span{color:var(--soft);font-weight:600;font-size:13px;display:block}
+
+/* town */
+.town{background:linear-gradient(180deg,#cfe8f2 0%,#cfe8f2 24%,#b9d8a3 24%,#a9cf92 100%);border:3px solid #fff;border-radius:22px;box-shadow:0 10px 30px rgba(80,60,30,.15);padding:14px;position:relative;overflow:hidden;min-height:250px}
+.sunny{position:absolute;top:14px;right:22px;font-size:40px;filter:drop-shadow(0 0 12px #ffe27a);transition:.6s}
+.cloud{position:absolute;top:22px;font-size:28px;opacity:.85;animation:drift 40s linear infinite}
+@keyframes drift{from{transform:translateX(-80px)}to{transform:translateX(900px)}}
+.grid{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;margin-top:62px;position:relative;z-index:1}
+.tile{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:clamp(18px,3.6vw,34px);border-radius:10px;background:rgba(255,255,255,.18);transition:transform .3s}
+.tile.new{animation:pop .5s cubic-bezier(.2,1.4,.4,1)}
+.tile.hurt{animation:shake .5s}
+@keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.toast{position:absolute;left:50%;top:14px;transform:translateX(-50%);background:var(--paper);border:2px solid var(--line);border-radius:14px;padding:10px 16px;font-weight:700;box-shadow:0 6px 0 var(--line);z-index:2;max-width:90%;text-align:center;animation:pop .4s}
+.toast.bad{border-color:#f2c1c1;background:#fff2f2}
+.toast.good{border-color:#cfe6d3;background:#f1faf3}
+
+/* meters */
+.meters{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}
+.m{background:var(--paper);border:2px solid var(--line);border-radius:16px;padding:10px 12px}
+.m .k{font-size:12px;color:var(--soft);font-weight:700}
+.m .v{font-size:22px;font-weight:800;line-height:1.2}
+.m .b{height:8px;background:#f0e8d6;border-radius:99px;overflow:hidden;margin-top:6px}
+.m .b i{display:block;height:100%;border-radius:99px;transition:width .6s}
+
+/* choice */
+.panel{background:var(--paper);border:2px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 6px 0 var(--line)}
+.panel h2{margin:0 0 4px;font-size:20px}
+.panel p{margin:0 0 12px;color:var(--soft)}
+.split{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin:10px 0}
+.side{border-radius:14px;padding:12px;text-align:center;border:2px solid transparent}
+.side.b{background:#fdebd6} .side.y{background:#e3f1f7}
+.side .ic{font-size:34px}
+.side .n{font-weight:800;font-size:22px}
+.side .t{font-size:12px;color:var(--soft);font-weight:600}
+input[type=range]{width:100%;accent-color:var(--sage2)}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+button.go{background:var(--sage2);color:#fff;border:0;border-radius:14px;padding:12px 22px;font:inherit;font-weight:800;font-size:16px;cursor:pointer;box-shadow:0 5px 0 #45805a;transition:.1s}
+button.go:active{transform:translateY(3px);box-shadow:0 2px 0 #45805a}
+button.go:disabled{opacity:.5;cursor:default}
+.ghost{background:transparent;border:2px solid var(--line);border-radius:14px;padding:10px 16px;font:inherit;font-weight:700;color:var(--soft);cursor:pointer}
+.preset{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.preset button{background:#fff;border:2px solid var(--line);border-radius:999px;padding:5px 12px;font:inherit;font-weight:700;font-size:13px;cursor:pointer;color:var(--soft)}
+.preset button:hover{border-color:var(--sage)}
+
+/* log */
+.log{margin-top:14px;font-size:14px;color:var(--soft)}
+.log div{padding:4px 0;border-bottom:1px dashed var(--line)}
+.log b{color:var(--ink)}
+
+/* report */
+.report{display:none}
+.report .card{background:var(--paper);border:2px solid var(--line);border-radius:20px;padding:20px;margin-top:14px;box-shadow:0 6px 0 var(--line)}
+.report h2{margin:0 0 6px;font-size:26px}
+.stars{font-size:30px;letter-spacing:4px}
+.facts{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+.fact{background:#fff;border:2px solid var(--line);border-radius:14px;padding:12px}
+.fact .big{font-size:26px;font-weight:800}
+.fact .s{font-size:13px;color:var(--soft)}
+.fact.g .big{color:var(--sage2)} .fact.r .big{color:#d86b6b}
+.lesson{background:#f1faf3;border:2px solid #cfe6d3;border-radius:14px;padding:12px 14px;margin-top:12px;font-weight:600}
+a{color:var(--sage2)}
+.foot{margin-top:24px;font-size:12px;color:var(--soft);text-align:center}
+@media (max-width:640px){.meters{grid-template-columns:repeat(2,1fr)}.facts{grid-template-columns:1fr}.split{grid-template-columns:1fr}.grid{gap:4px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h1>Ten Good Years <small>a cosy little game about spending a billion dollars</small></h1>
+    <div class="year" id="year">Year 1 <span>of 10 · $100m to spend</span></div>
+  </div>
+
+  <div class="town" id="town">
+    <div class="sunny" id="sun">☀️</div>
+    <div class="cloud" style="left:0">☁️</div>
+    <div class="cloud" style="left:-300px;top:40px;animation-delay:-18s">☁️</div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div class="meters">
+    <div class="m"><div class="k">💰 Treasury returns</div><div class="v" id="mT">$0m</div><div class="b"><i id="bT" style="background:var(--sun)"></i></div></div>
+    <div class="m"><div class="k">🕊️ Peace &amp; safety</div><div class="v" id="mS">calm</div><div class="b"><i id="bS" style="background:var(--sage)"></i></div></div>
+    <div class="m"><div class="k">🗳️ Trust in government</div><div class="v" id="mP">50%</div><div class="b"><i id="bP" style="background:var(--sky2)"></i></div></div>
+    <div class="m"><div class="k">🌱 Paid forward</div><div class="v" id="mF">$0m</div><div class="b"><i id="bF" style="background:var(--youth)"></i></div></div>
+  </div>
+
+  <div class="panel" id="panel">
+    <h2>How do you spend this year's $100m?</h2>
+    <p>Factories and oil rigs pay back fast. Schools for girls pay back slower, but they keep paying, and they pay forward.</p>
+    <div class="preset"><button data-v="0">All factories</button><button data-v="25">Mostly factories</button><button data-v="50">Half and half</button><button data-v="75">Mostly schools</button><button data-v="100">All schools</button></div>
+    <div class="split">
+      <div class="side b"><div class="ic">🏭</div><div class="n" id="nB">$50m</div><div class="t">factories &amp; rigs</div></div>
+      <input type="range" id="split" min="0" max="100" step="5" value="50">
+      <div class="side y"><div class="ic">🏫</div><div class="n" id="nY">$50m</div><div class="t">schools &amp; clinics for girls</div></div>
+    </div>
+    <div class="btns"><button class="go" id="go">Spend it and see what happens ▶</button><button class="ghost" id="reset">Start over</button></div>
+    <div class="log" id="log"></div>
+  </div>
+
+  <div class="report" id="report"></div>
+
+  <div class="foot">Companion to the <a href="../">AI-DEFENSE national security simulator</a>. Figures are illustrative and drawn from the concept deck.</div>
+</div>
+
+<script>
+// ---- the same points as the simulator, wrapped in a game ----
+const YEARS=10, BUDGET=100; // $m per year, $1bn total
+const EVENTS=[
+  {k:"none",p:.62},
+  {k:"conflict",p:.14,ic:"⚔️",name:"Conflict flares with a neighbour",bad:true},
+  {k:"civil",p:.10,ic:"🔥",name:"Bad actors stir up violence in the capital",bad:true},
+  {k:"weather",p:.08,ic:"🌪️",name:"A storm floods the river valley",bad:true},
+  {k:"epidemic",p:.06,ic:"🦠",name:"An outbreak closes the markets",bad:true},
+];
+let S;
+function reset(){
+  S={year:1,treasury:0,forward:0,crime:1.0,trust:50,bizTotal:0,youthTotal:0,pipeline:[],tiles:Array(40).fill(""),log:[],done:false,shocks:0};
+  document.getElementById("report").style.display="none";
+  document.getElementById("panel").style.display="block";
+  document.getElementById("log").innerHTML="";
+  render();
+}
+const $=id=>document.getElementById(id);
+const fmt=n=>"$"+Math.round(n)+"m";
+function pickEvent(){let r=Math.random();for(const e of EVENTS){if((r-=e.p)<=0)return e;}return EVENTS[0];}
+function place(icon,cls){const free=S.tiles.map((t,i)=>t?-1:i).filter(i=>i>=0);if(!free.length)return;const i=free[Math.floor(Math.random()*free.length)];S.tiles[i]=icon;S.newTile=i;S.newCls=cls;}
+function hurt(){const busy=S.tiles.map((t,i)=>t?i:-1).filter(i=>i>=0);if(!busy.length)return;const i=busy[Math.floor(Math.random()*busy.length)];S.hurtTile=i;}
+
+function step(){
+  const yPct=+$("split").value, y=BUDGET*yPct/100, b=BUDGET-y;
+  S.bizTotal+=b; S.youthTotal+=y;
+  const ev=pickEvent(); if(ev.bad)S.shocks++;
+  const youthShare=S.youthTotal/(S.bizTotal+S.youthTotal||1);
+  // returns: 6:1 over 10y ≈ 0.6/yr. Business drops to 3:1 in a shock year. Youth holds at 6:1 but starts 2 years later.
+  const bizRate=ev.bad?0.3:0.6;
+  let gain=0;
+  S.pipeline.push({b,y,age:0});
+  S.pipeline.forEach(p=>{p.age++; gain+=p.b*bizRate; if(p.age>=3) gain+=p.y*0.6;});
+  // paid forward: youth returns reinvest at 55%, business at 5%
+  const fwd=S.pipeline.reduce((a,p)=>a+(p.age>=3?p.y*0.6*0.55:0)+p.b*bizRate*0.05,0);
+  S.treasury+=gain; S.forward+=fwd;
+  // security: in a shock, crime heads to 3x if business-only, 0.6x if youth-heavy
+  const target=ev.bad? (3.0-(3.0-0.6)*youthShare) : (1.0-0.4*youthShare);
+  S.crime+= (target-S.crime)*0.5;
+  // trust: shocks cost -4 with no youth investment, gain +14 with full youth investment
+  if(ev.bad) S.trust+= -4+18*youthShare; else S.trust+= 1+2*youthShare;
+  S.trust=Math.max(5,Math.min(95,S.trust));
+  // town
+  S.newTile=S.hurtTile=null;
+  if(b>=25) place(["🏭","🛢️","🏢","📈"][Math.floor(Math.random()*4)],"b");
+  if(y>=25) place(["🏫","👧","🌾","🏥","📚"][Math.floor(Math.random()*5)],"y");
+  if(ev.bad && S.crime>1.4){hurt();}
+  // narrate
+  let line=`<b>Year ${S.year}</b> · ${fmt(b)} factories, ${fmt(y)} schools. `;
+  if(ev.bad){ line+=`${ev.ic} ${ev.name}. `;
+    line+= youthShare>0.5 ? `The town holds together: neighbours know each other, girls stay in school, trust rises.` : `Dropouts drift into gangs and crime climbs; voters blame the government.`;
+  } else line+=`A quiet year. Returns of ${fmt(gain)} come in.`;
+  S.log.unshift(line);
+  S.toast=ev.bad?{t:`${ev.ic} ${ev.name}`,c:"bad"}:{t:`🌤️ A quiet year · +${fmt(gain)}`,c:"good"};
+  S.year++;
+  if(S.year>YEARS){S.done=true;}
+  render();
+  if(S.done) report();
+}
+
+function render(){
+  $("year").innerHTML=S.done?`Done! <span>ten years · $1bn spent</span>`:`Year ${S.year} <span>of ${YEARS} · $${BUDGET}m to spend</span>`;
+  $("grid").innerHTML=S.tiles.map((t,i)=>`<div class="tile ${i===S.newTile?'new':''} ${i===S.hurtTile?'hurt':''}">${i===S.hurtTile?'💥':t}</div>`).join("");
+  const old=document.querySelector(".toast"); if(old)old.remove();
+  if(S.toast){const d=document.createElement("div");d.className="toast "+S.toast.c;d.textContent=S.toast.t;$("town").appendChild(d);setTimeout(()=>d.remove(),2600);S.toast=null;}
+  $("sun").textContent=S.crime>1.8?"🌧️":S.crime>1.2?"⛅":"☀️";
+  $("mT").textContent=fmt(S.treasury); $("bT").style.width=Math.min(100,S.treasury/60)+"%";
+  const s=S.crime; $("mS").textContent=s<0.8?"thriving":s<1.2?"calm":s<2?"uneasy":"unrest"; $("bS").style.width=Math.max(4,(3.2-s)/3.2*100)+"%"; $("bS").style.background=s>1.6?"var(--rose)":s>1.1?"var(--peach)":"var(--sage)";
+  $("mP").textContent=Math.round(S.trust)+"%"; $("bP").style.width=S.trust+"%";
+  $("mF").textContent=fmt(S.forward); $("bF").style.width=Math.min(100,S.forward/25)+"%";
+  $("log").innerHTML=S.log.slice(0,4).map(l=>`<div>${l}</div>`).join("");
+  $("go").disabled=S.done;
+}
+
+function report(){
+  const ys=S.youthTotal/1000, bs=S.bizTotal/1000;
+  const stars= (S.crime<1?2:S.crime<1.6?1:0)+(S.trust>60?2:S.trust>45?1:0)+(S.forward>150?1:0);
+  const lesson= ys>=0.6?"You paid it forward. When the shocks came, the girls you kept in school held the town together, and the returns kept compounding into the next generation."
+    : ys>=0.4?"A balanced hand. Factories paid quickly, schools paid steadily, and the town weathered most of it."
+    : "Fast money, fragile town. The factories paid out, but with nobody investing in the next generation every shock landed hard.";
+  $("panel").style.display="none";
+  $("report").style.display="block";
+  $("report").innerHTML=`<div class="card">
+    <h2>Your ten years</h2><div class="stars">${"⭐".repeat(stars)}${"☆".repeat(5-stars)}</div>
+    <p style="color:var(--soft);margin:6px 0 0">You put <b>$${bs.toFixed(2)}bn</b> into factories and <b>$${ys.toFixed(2)}bn</b> into girls and schools. The country took <b>${S.shocks}</b> shock${S.shocks===1?"":"s"}.</p>
+    <div class="facts">
+      <div class="fact g"><div class="big">${fmt(S.treasury)}</div><div class="s">came back to the treasury. Factories return about 6:1 in calm years but only 3:1 in a shock. Schools hold at 6:1.</div></div>
+      <div class="fact ${S.crime<1?'g':'r'}"><div class="big">${S.crime.toFixed(1)}×</div><div class="s">crime and unrest vs. where you started. Business-only towns hit 3× in a conflict; youth-heavy towns fall to 0.6×.</div></div>
+      <div class="fact ${S.trust>50?'g':'r'}"><div class="big">${Math.round(S.trust)}%</div><div class="s">trust in government. In a shock, that's −4 points if nobody invested in children, +14 if you did. 81% of likely US voters back help for vulnerable children.</div></div>
+      <div class="fact g"><div class="big">${fmt(S.forward)}</div><div class="s">paid forward to the next generation. Girls reinvest about 55% of what they gain in their own children; business returns pass on about 5%.</div></div>
+    </div>
+    <div class="lesson">🌱 ${lesson}</div>
+    <div class="btns" style="margin-top:14px"><button class="go" onclick="reset()">Play again</button><a class="ghost" style="display:inline-block;text-decoration:none" href="../">See the full simulator →</a></div>
+  </div>`;
+  $("report").scrollIntoView({behavior:"smooth"});
+}
+
+$("split").addEventListener("input",e=>{const y=+e.target.value;$("nY").textContent=fmt(y);$("nB").textContent=fmt(100-y);});
+document.querySelectorAll(".preset button").forEach(b=>b.onclick=()=>{$("split").value=b.dataset.v;$("split").dispatchEvent(new Event("input"));});
+$("go").onclick=step; $("reset").onclick=reset;
+reset();
+</script>
+</body>
+</html>
